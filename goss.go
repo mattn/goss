@@ -14,7 +14,7 @@ import (
 
 func usage() {
 	fmt.Printf(`Usage:
-    goss ls sakura://<bucket>/path/to/file.txt
+    goss ls sakura://<bucket>/path/to/
     goss put sakura://<bucket>/path/to/ file.txt
     goss get sakura://<bucket>/path/to/file.txt
     goss cat sakura://<bucket>/path/to/file.txt
