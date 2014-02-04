@@ -17,6 +17,7 @@ func usage() {
     goss ls sakura://<bucket>/path/to/
     goss put sakura://<bucket>/path/to/ file.txt
     goss get sakura://<bucket>/path/to/file.txt
+    goss del sakura://<bucket>/path/to/file.txt
     goss cat sakura://<bucket>/path/to/file.txt
 `)
 	os.Exit(1)
@@ -110,6 +111,14 @@ func main() {
 			log.Fatal(err.Error())
 		}
 		os.Stdout.Write(b)
+	case "del":
+		if len(os.Args) != 3 {
+			usage()
+		}
+		err := bucket.Del(matches[2])
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 	default:
 		usage()
 	}
