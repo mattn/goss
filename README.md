@@ -17,7 +17,7 @@ Listing
 Upload
 
     goss put sakura://<bucket>/path/to/ file.txt
-    goss put sakura://<bucket>/path/to/ file.txt
+    goss put sakura://<bucket>/path/to/another-name.txt file.txt
 
 Download
 
