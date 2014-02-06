@@ -2,17 +2,13 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"github.com/gonuts/commander"
 	"launchpad.net/goamz/aws"
-	"launchpad.net/goamz/s3"
-	"log"
-	"mime"
 	"os"
-	"path"
-	"path/filepath"
 	"regexp"
 )
 
+/*
 func usage() {
 	fmt.Printf(`Usage:
     goss ls sakura://<bucket>/path/to/
@@ -23,6 +19,7 @@ func usage() {
 `)
 	os.Exit(1)
 }
+*/
 
 var pat = regexp.MustCompile("^sakura://([^/]+)/(.*)")
 
@@ -44,103 +41,21 @@ func main() {
 		"https://b.storage.sakura.ad.jp",
 	}
 
-	if len(os.Args) < 2 {
-		usage()
+	command := &commander.Command{
+		UsageLine: os.Args[0],
+		Short:     "sakura storage utility",
+	}
+	command.Subcommands = []*commander.Command{
+		make_cmd_ls(auth, region),
+		make_cmd_put(auth, region),
+		make_cmd_get(auth, region),
+		make_cmd_cat(auth, region),
+		make_cmd_del(auth, region),
 	}
 
-	switch os.Args[1] {
-	case "ls":
-		if len(os.Args) != 3 {
-			usage()
-		}
-		matches := pat.FindStringSubmatch(os.Args[2])
-		if len(matches) == 0 {
-			usage()
-		}
-		s := s3.New(auth, region)
-		bucket := s.Bucket(matches[1])
-		res, err := bucket.List(matches[2], "/", "", 1000)
-		if err != nil {
-			log.Fatal(err)
-		}
-		for _, c := range res.CommonPrefixes {
-			fmt.Println(c)
-		}
-		for _, c := range res.Contents {
-			fmt.Println(c.Key)
-		}
-	case "put":
-		if len(os.Args) != 4 {
-			usage()
-		}
-		matches := pat.FindStringSubmatch(os.Args[2])
-		if len(matches) == 0 {
-			usage()
-		}
-		b, err := ioutil.ReadFile(os.Args[2])
-		if err != nil {
-			log.Fatal(err)
-		}
-		typ := mime.TypeByExtension(filepath.Ext(os.Args[2]))
-		if typ == "" {
-			typ = "application/octet-stream"
-		}
-		file := path.Join(matches[2], os.Args[3])
-		s := s3.New(auth, region)
-		bucket := s.Bucket(matches[1])
-		err = bucket.Put(file, b, typ, s3.BucketOwnerFull)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-	case "get":
-		if len(os.Args) != 3 {
-			usage()
-		}
-		matches := pat.FindStringSubmatch(os.Args[2])
-		if len(matches) == 0 {
-			usage()
-		}
-		s := s3.New(auth, region)
-		bucket := s.Bucket(matches[1])
-		b, err := bucket.Get(matches[2])
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		p := path.Base(matches[2])
-		err = ioutil.WriteFile(p, b, 0664)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-	case "cat":
-		if len(os.Args) != 3 {
-			usage()
-		}
-		matches := pat.FindStringSubmatch(os.Args[2])
-		if len(matches) == 0 {
-			usage()
-		}
-		s := s3.New(auth, region)
-		bucket := s.Bucket(matches[1])
-		b, err := bucket.Get(matches[2])
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		os.Stdout.Write(b)
-	case "del":
-		if len(os.Args) != 3 {
-			usage()
-		}
-		matches := pat.FindStringSubmatch(os.Args[2])
-		if len(matches) == 0 {
-			usage()
-		}
-		s := s3.New(auth, region)
-		bucket := s.Bucket(matches[1])
-		err := bucket.Del(matches[2])
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-	default:
-		usage()
+	err := command.Dispatch(os.Args[1:])
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		os.Exit(1)
 	}
 }
