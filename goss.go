@@ -48,19 +48,17 @@ func main() {
 		usage()
 	}
 
-	matches := pat.FindStringSubmatch(os.Args[2])
-	if len(matches) == 0 {
-		usage()
-	}
-
-	s := s3.New(auth, region)
-	bucket := s.Bucket(matches[1])
-
 	switch os.Args[1] {
 	case "ls":
 		if len(os.Args) != 3 {
 			usage()
 		}
+		matches := pat.FindStringSubmatch(os.Args[2])
+		if len(matches) == 0 {
+			usage()
+		}
+		s := s3.New(auth, region)
+		bucket := s.Bucket(matches[1])
 		res, err := bucket.List(matches[2], "/", "", 1000)
 		if err != nil {
 			log.Fatal(err)
@@ -72,15 +70,21 @@ func main() {
 		if len(os.Args) != 4 {
 			usage()
 		}
-		b, err := ioutil.ReadFile(os.Args[3])
+		matches := pat.FindStringSubmatch(os.Args[2])
+		if len(matches) == 0 {
+			usage()
+		}
+		b, err := ioutil.ReadFile(os.Args[2])
 		if err != nil {
 			log.Fatal(err)
 		}
-		typ := mime.TypeByExtension(filepath.Ext(os.Args[3]))
+		typ := mime.TypeByExtension(filepath.Ext(os.Args[2]))
 		if typ == "" {
 			typ = "application/octet-stream"
 		}
 		file := path.Join(matches[2], os.Args[3])
+		s := s3.New(auth, region)
+		bucket := s.Bucket(matches[1])
 		err = bucket.Put(file, b, typ, s3.BucketOwnerFull)
 		if err != nil {
 			log.Fatal(err.Error())
@@ -89,6 +93,12 @@ func main() {
 		if len(os.Args) != 3 {
 			usage()
 		}
+		matches := pat.FindStringSubmatch(os.Args[2])
+		if len(matches) == 0 {
+			usage()
+		}
+		s := s3.New(auth, region)
+		bucket := s.Bucket(matches[1])
 		b, err := bucket.Get(matches[2])
 		if err != nil {
 			log.Fatal(err.Error())
@@ -102,6 +112,12 @@ func main() {
 		if len(os.Args) != 3 {
 			usage()
 		}
+		matches := pat.FindStringSubmatch(os.Args[2])
+		if len(matches) == 0 {
+			usage()
+		}
+		s := s3.New(auth, region)
+		bucket := s.Bucket(matches[1])
 		b, err := bucket.Get(matches[2])
 		if err != nil {
 			log.Fatal(err.Error())
@@ -111,6 +127,12 @@ func main() {
 		if len(os.Args) != 3 {
 			usage()
 		}
+		matches := pat.FindStringSubmatch(os.Args[2])
+		if len(matches) == 0 {
+			usage()
+		}
+		s := s3.New(auth, region)
+		bucket := s.Bucket(matches[1])
 		err := bucket.Del(matches[2])
 		if err != nil {
 			log.Fatal(err.Error())
