@@ -6,6 +6,7 @@ import (
 	"launchpad.net/goamz/aws"
 	"launchpad.net/goamz/s3"
 	"log"
+	"mime"
 	"os"
 	"path"
 	"path/filepath"
@@ -75,16 +76,11 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		typ := filepath.Ext(os.Args[3])
+		typ := mime.TypeByExtension(filepath.Ext(os.Args[3]))
 		if typ == "" {
 			typ = "application/octet-stream"
 		}
-		dir, file := path.Split(os.Args[2])
-		if file == "" {
-			file = path.Join(dir, filepath.Base(os.Args[3]))
-		} else {
-			file = path.Join(dir, file)
-		}
+		file := path.Join(matches[2], os.Args[3])
 		err = bucket.Put(file, b, typ, s3.BucketOwnerFull)
 		if err != nil {
 			log.Fatal(err.Error())
