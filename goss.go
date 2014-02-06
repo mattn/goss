@@ -24,7 +24,7 @@ func usage() {
 	os.Exit(1)
 }
 
-var pat = regexp.MustCompile("^sakura://(.+)/(.*)")
+var pat = regexp.MustCompile("^sakura://([^/]+)/(.*)")
 
 func main() {
 	auth := aws.Auth{
@@ -63,8 +63,12 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		for _, c := range res.Contents {
-			fmt.Println(c.Key)
+		for i, c := range res.Contents {
+			if i < len(res.CommonPrefixes) {
+				fmt.Println(path.Join(res.CommonPrefixes[i], c.Key))
+			} else {
+				fmt.Println(c.Key)
+			}
 		}
 	case "put":
 		if len(os.Args) != 4 {
