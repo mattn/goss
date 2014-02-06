@@ -10,11 +10,11 @@ import (
 
 func make_cmd_ls(auth aws.Auth, region aws.Region) *commander.Command {
 	cmd_ls := func(cmd *commander.Command, args []string) error {
-		if len(args) != 2 {
+		if len(args) != 1 {
 			cmd.Usage()
 			os.Exit(1)
 		}
-		matches := pat.FindStringSubmatch(args[1])
+		matches := pat.FindStringSubmatch(args[0])
 		if len(matches) == 0 {
 			cmd.Usage()
 			os.Exit(1)
