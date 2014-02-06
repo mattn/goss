@@ -63,12 +63,11 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		for i, c := range res.Contents {
-			if i < len(res.CommonPrefixes) {
-				fmt.Println(path.Join(res.CommonPrefixes[i], c.Key))
-			} else {
-				fmt.Println(c.Key)
-			}
+		for _, c := range res.CommonPrefixes {
+			fmt.Println(c)
+		}
+		for _, c := range res.Contents {
+			fmt.Println(c.Key)
 		}
 	case "put":
 		if len(os.Args) != 4 {
