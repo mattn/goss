@@ -9,11 +9,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 func make_cmd_put(auth aws.Auth, region aws.Region) *commander.Command {
 	cmd_put := func(cmd *commander.Command, args []string) error {
-		if len(args) != 3 {
+		if len(args) != 2 {
 			cmd.Usage()
 			os.Exit(1)
 		}
@@ -30,7 +31,10 @@ func make_cmd_put(auth aws.Auth, region aws.Region) *commander.Command {
 		if typ == "" {
 			typ = "application/octet-stream"
 		}
-		file := path.Join(matches[2], filepath.Base(args[0]))
+		file := matches[2]
+		if strings.HasSuffix(matches[2], "/") {
+			file = path.Join(matches[2], filepath.Base(args[0]))
+		}
 		s := s3.New(auth, region)
 		bucket := s.Bucket(matches[1])
 		err = bucket.Put(file, b, typ, s3.BucketOwnerFull)
@@ -42,7 +46,7 @@ func make_cmd_put(auth aws.Auth, region aws.Region) *commander.Command {
 
 	return &commander.Command{
 		Run:       cmd_put,
-		UsageLine: "put sakura://<bucket>/path/ file",
+		UsageLine: "put file sakura://<bucket>/path/",
 		Short:     "put file",
 	}
 }
