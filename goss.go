@@ -8,19 +8,6 @@ import (
 	"regexp"
 )
 
-/*
-func usage() {
-	fmt.Printf(`Usage:
-    goss ls sakura://<bucket>/path/to/
-    goss put file.txt sakura://<bucket>/path/to/
-    goss get sakura://<bucket>/path/to/file.txt
-    goss del sakura://<bucket>/path/to/file.txt
-    goss cat sakura://<bucket>/path/to/file.txt
-`)
-	os.Exit(1)
-}
-*/
-
 var pat = regexp.MustCompile("^sakura://([^/]+)/(.*)")
 
 func main() {
